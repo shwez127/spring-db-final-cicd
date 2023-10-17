@@ -1,0 +1,103 @@
+apiVersion: apps/v1
+kind: Deployment       #------------------TRY STATEFULSET_and HEADLESS SERVICE-------------------
+metadata:
+  name: db  # Name of the deployment
+  namespace: shwe  # Namespace where the deployment will be created
+  # annotations:
+  #   secrets-store.csi.k8s.io/secretProviderClass: "azure-kvname-system-msi"
+spec:
+  selector:
+    matchLabels:
+      app: db  # Select pods with the label 'app: db'
+  template:
+    metadata:
+      labels:
+        app: db  # Apply the label 'app: db' to pods created by this deployment
+    spec:
+
+      # volumes:
+      #   - name: mongo-data
+      #     csi: 
+      #       driver: secrets-store.csi.k8s.io
+      #       readOnly: true
+      #       volumeAttributes:
+      #         secretProviderClass: azure-kvname-system-msi
+      containers:
+      - name: db  # Name of the container
+        image: mongo  # Docker image to use for the container (MongoDB)
+        ports:
+        - containerPort: 27017  # Port that the container listens on
+
+        #-- trying to dynmaically provide db port DIDNT WORK
+        # volumeMounts: 
+        #   - name: db-connection
+        #     mountPath: /opt  #bcoz its a file where data is stored which can be modified later
+       
+        env:  # Define environment variables for the container
+          - name: MONGO_INITDB_ROOT_USERNAME  # Name of the environment variable
+            #value: shwe  # Value for the MongoDB root username
+            valueFrom:
+              secretKeyRef:
+                name: mongodb-secret
+                key: username
+          
+          - name: MONGO_INITDB_ROOT_PASSWORD  # Name of the environment variable
+            # value: shwe  # Value for the MongoDB root password
+            # Make sure to replace the 'shwe' value with your actual password
+            valueFrom:
+              secretKeyRef: 
+                name: mongodb-secret
+                key: password
+
+        volumeMounts:
+          - name: mongo-data
+            mountPath: /data/db
+
+      volumes:
+        - name: mongo-data
+          persistentVolumeClaim:
+            claimName: my-pvc
+
+      #dynamic DB DINT WORK
+      # volumes:
+      #   - name: db-connection
+      #     configMap:
+      #       name: db-cm
+       
+
+
+
+
+
+      #   volumeMounts:
+      #     - name: host  # Name of the volume to mount
+      #       mountPath: /data/db  # Mount path inside the container
+      # volumes:
+      # - name: host  # Name of the volume
+      #   hostPath:
+      #     path: /data  # Host path where the volume data will be stored
+ 
+      #   volumeMounts:
+      #     - name: nfs-share  # Name of the volume to mount
+      #       mountPath: /data/db  # Mount path inside the container
+      # volumes:
+      # - name: nfs-share  # Name of the volume
+      #   nfs:
+      #     server: 10.0.0.6
+      #     path: /mnt/nfs-share
+---
+#Define a Service to expose the MongoDB instance
+apiVersion: v1
+kind: Service
+metadata:
+  name: db-svc  # Name of the service
+  namespace: shwe  # Namespace where the service will be created
+spec:
+  clusterIP: None
+  selector:
+    app: db  # Select pods with the label 'app: db'
+  ports:
+  - port: 27017  # Port that the service listens on
+    targetPort: 27017 # Port that the service forwards traffic to
+        #not a web app or a http app so using same value for port and target port
+  type: ClusterIP

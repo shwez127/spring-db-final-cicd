@@ -1,0 +1,25 @@
+# apiVersion: v1
+# kind: PersistentVolumeClaim
+# metadata:
+#   name: my-pvc
+#   namespace: ingress-nginx
+# spec:
+#   accessModes:
+#     - ReadWriteOnce
+#   storageClassName: sql-db
+#   resources:
+#     requests:
+#       storage: 10Gi
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: my-pvc
+  namespace: shwe
+spec:
+  accessModes:
+    - ReadWriteOnce
+  storageClassName:  mongo-db
+  resources:
+    requests:
+      storage: 10Gi

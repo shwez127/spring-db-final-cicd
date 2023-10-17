@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: ingress-rules
+  namespace: shwe  # Namespace where the Ingress resource is located
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+spec:
+  tls:
+    - hosts:
+        - shwethaspringdb.com
+      secretName: shwetha-ingress-tls
+  rules:
+  - host: "shwethaspringdb.com"
+    http:
+      paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: spring-svc
+              port:
+                number: 80

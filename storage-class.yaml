@@ -1,13 +1,3 @@
-# apiVersion: storage.k8s.io/v1
-# kind: StorageClass
-# metadata:
-#   name: sql-db
-# provisioner: disk.csi.azure.com
-# parameters:
-#   cachingmode: None
-#   kind: Managed
----
-
 apiVersion: storage.k8s.io/v1
 kind: StorageClass
 metadata:

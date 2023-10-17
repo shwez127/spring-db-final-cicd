@@ -26,11 +26,7 @@ spec:
               name: db-cm
               key: database_url
 
-        # - name: MONGO_DB_PORT
-        #   valueFrom:
-        #     configMapKeyRef:
-        #       name: db-cm
-        #       key: db-port           
+                
 
         - name: MONGO_DB_USERNAME
           # value: shwe

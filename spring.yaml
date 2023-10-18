@@ -4,7 +4,7 @@ metadata:
   name: spring
   namespace: shwe # Added namespace where the deployment will be created
 spec:
-  replicas: 2
+  replicas: 3
   selector:
     matchLabels:
       app: spring
